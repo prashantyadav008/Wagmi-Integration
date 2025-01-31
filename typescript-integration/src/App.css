@@ -53,6 +53,7 @@
   display: block;
   padding-top: 0.6rem;
   float: right;
+  padding-right: 20px;
 }
 
 .connectWallet w3m-button {

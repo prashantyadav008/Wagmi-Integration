@@ -85,6 +85,12 @@ export const Dashboard = () => {
           document
             .getElementById("loaderVisibility")
             .classList.remove("is-active");
+
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
         }
 
         document

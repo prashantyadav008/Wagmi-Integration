@@ -1,89 +1,102 @@
 /** @format */
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
+
 import { Row, Col, Form, Button } from "react-bootstrap";
 import Swal from "sweetalert2";
 
 import { ConnectButton } from "./ConnectButton.tsx";
 
+import { Hooks } from "../Wagmi/Hooks.tsx";
+
 export const Dashboard = () => {
   const [walletAddress, setWalletAddress] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState<number>();
   const [hash, setHash] = useState("");
 
-  const handleChange = (e) => {
-    //   const regex = /^(?:100(?:\.0+)?|\d{0,2}(?:\.\d+)?|0(?:\.\d+)?)$/;
-    //   if (
-    //     (e.target.value !== "" && regex.test(e.target.value)) ||
-    //     e.target.value >= 0
-    //   ) {
-    //     setAmount(e.target.value);
-    //   } else if (e.target.value === "") {
-    //     setAmount(0);
-    //   } else if (e.target.value === e) {
-    //     setAmount(0);
-    //   }
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const regex = /^(?:100(?:\.0+)?|\d{0,2}(?:\.\d+)?|0(?:\.\d+)?)$/;
+    const value = e.target.value;
+
+    if (value === "") {
+      setAmount(0); // Set to 0 if empty string
+    } else {
+      const numberValue = parseFloat(value); // Convert to number
+
+      // Validate the value based on regex and check if it's a valid number
+      if (regex.test(value) && !isNaN(numberValue)) {
+        setAmount(numberValue); // Set the valid number
+      } else {
+        setAmount(0); // Set to 0 if invalid
+      }
+    }
   };
 
   const submitHandler = async () => {
-    // if (walletAddress == "") {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Oops...",
-    //     text: "Wallet Address Not Found",
-    //   });
-    //   return false;
-    // }
-    // if (amount <= 0) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Oops...",
-    //     text: "Amount must be greater than 0",
-    //   });
-    //   return false;
-    // }
-    // Swal.fire({
-    //   title: "Are you sure?",
-    //   text: "You won't be able to revert this!",
-    //   icon: "warning",
-    //   showCancelButton: true,
-    //   confirmButtonColor: "#3085d6",
-    //   cancelButtonColor: "#d33",
-    //   confirmButtonText: "Yes, Transfer it!",
-    // }).then(async (result) => {
-    //   if (result.isConfirmed) {
-    //     document.getElementById("loaderVisibility").classList.add("is-active");
-    //     try {
-    //       // show loader
-    //       const contract = Hooks();
-    //       const response = await contract.sendTransactions(
-    //         walletAddress,
-    //         amount
-    //       );
-    //       if (response.status) {
-    //         Swal.fire({
-    //           icon: "success",
-    //           title: "Transferred Amount",
-    //           text: response.message,
-    //         });
-    //         setHash(response.hash);
-    //       } else {
-    //         Swal.fire({
-    //           icon: "error",
-    //           title: "Oops...",
-    //           text: response.message,
-    //         });
-    //       }
-    //     } catch (e) {
-    //       console.log("Amount not Transferd --->>", e);
-    //       document
-    //         .getElementById("loaderVisibility")
-    //         .classList.remove("is-active");
-    //     }
-    //     document
-    //       .getElementById("loaderVisibility")
-    //       .classList.remove("is-active");
-    //   }
-    // });
+    if (walletAddress == "") {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Wallet Address Not Found",
+      });
+      return false;
+    }
+    if (amount === undefined || amount <= 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Amount must be greater than 0",
+      });
+      return false;
+    }
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Transfer it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        document.getElementById("loaderVisibility")?.classList.add("is-active");
+
+        const address = walletAddress as `0x${string}`;
+        try {
+          // show loader
+          const contract = Hooks();
+          const response = await contract.sendTransactions(address, amount);
+          if (response.status) {
+            Swal.fire({
+              icon: "success",
+              title: "Transferred Amount",
+              text: response.message,
+            });
+            setHash(response.hash);
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: response.message,
+            });
+          }
+        } catch (e) {
+          console.log("Amount not Transferd --->>", e);
+          document
+            .getElementById("loaderVisibility")
+            ?.classList.remove("is-active");
+
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          });
+        }
+        document
+          .getElementById("loaderVisibility")
+          ?.classList.remove("is-active");
+      }
+    });
   };
 
   return (
@@ -119,7 +132,7 @@ export const Dashboard = () => {
               controlId="exampleForm.ControlTextarea1">
               <Form.Label>Amount</Form.Label>
               <Form.Control
-                type="tel"
+                type="number"
                 value={amount}
                 onChange={handleChange}
                 placeholder="Enter Amount"
