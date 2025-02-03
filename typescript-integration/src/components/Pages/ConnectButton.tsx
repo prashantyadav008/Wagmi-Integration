@@ -1,5 +1,5 @@
 /** @format */
 
 export const ConnectButton = () => {
-  return <button />;
+  return <w3m-button />;
 };

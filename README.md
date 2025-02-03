@@ -1,6 +1,8 @@
 <!-- @format -->
 
-# React + Vite Fresh Setup
+# Wagmi Integration
+
+    https://wagmi-integration.netlify.app/
 
 ## Install Vite
 

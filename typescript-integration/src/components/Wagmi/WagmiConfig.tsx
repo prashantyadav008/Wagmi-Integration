@@ -1,10 +1,17 @@
 /** @format */
 
 import { createConfig, http, injected } from "@wagmi/core";
+
 import { sepolia } from "@wagmi/core/chains";
 import { walletConnect } from "@wagmi/connectors";
 
 import { createWalletClient, custom } from "viem";
+
+// declare module "wagmi" {
+//   interface Register {
+//     config: typeof config;
+//   }
+// }
 
 const config = createConfig({
   chains: [sepolia],
